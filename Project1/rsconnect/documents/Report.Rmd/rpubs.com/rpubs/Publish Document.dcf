@@ -1,4 +1,4 @@
-name: Document
+name: Publish Document
 title:
 username:
 account: rpubs
@@ -6,5 +6,5 @@ server: rpubs.com
 hostUrl: rpubs.com
 appId: https://api.rpubs.com/api/v1/document/536271/aaf3faecbb0d479aa0a8ed947c482c86
 bundleId: https://api.rpubs.com/api/v1/document/536271/aaf3faecbb0d479aa0a8ed947c482c86
-url: http://rpubs.com/publish/claim/536271/f94c38caa9944ba28d959c4f23204713
-when: 1570401083.70532
+url: http://rpubs.com/joshyp123/536271
+when: 1570401513.80663

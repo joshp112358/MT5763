@@ -11,9 +11,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 ### Executive Summary
 
-Our report finds that the maximum amount of winnings possible only betting before the race on the winning horse is 11976.60 GBP, taking a lay position that would cover the back stake, if the winning horse had actually lost. The total lay and back stakes were 70.28 + 1303.47 = 1373.75, so a total percentage profit of 770%. 
+Our report finds that the maximum amount of winnings possible only betting before the race on the winning horse is 12,698.87. Your initial investment was 437.14+22.45 = 459.59, (or 874.92 if you include your liability), so your percentage return is 2750%.
 
-The expectation and variance shows that gamblers price things somewhat correctly, that is they give each horse an equal shot, and have tremendous anxiety. 
+The expectation and variance reflects uncertainty to predictions, which is right as gamblers should be uncertain. 
 
 Relevant plots are redone in SAS, to prove repeatability, and are attached in a seperate file . 
 
@@ -25,7 +25,7 @@ Backing a horse is betting that that horse will win. Laying a horse is betting t
 
 Odds are the multiple offered on a stake for a given bet, laying or backing. Odds given are intrinsically related to the probability that a certain event will occur. This is because the goal of a fair bet is to make the expected value zero. 
 
-A beautiful analysis on whether such gambling is worth doing is Daniel Bernoulli's "Exposition of a New Theory on the Measurement of Risk" from 1738. It is available on JSTOR. 
+A beautiful analysis on whether such gambling is worth doing is Daniel Bernoulli's "Exposition of a New Theory on the Measurement of Risk" from 1738. A link is attached below. 
 
 ## Exploratory Data Analysis
 
@@ -60,7 +60,7 @@ vis_miss(HorseData, warn_large_data = FALSE)
 
 For Ease of analysis, we would like to remove NaN values, but important information - whether the Horse won or lost - is in these columns. A Column is formed of all False Booleans, then the competitor 11473056 with the winning horse is changed to true. It does not matter if you remove the final backPrice1 rows. By that point the horse would have lost anyways, so it would not be possible to lay them.
 
-```{r}
+```{r }
 HorseData$Winner <- FALSE
 HorseData$Winner[HorseData$competitor == 11473056] <- TRUE
 
@@ -168,8 +168,8 @@ plot(competitor4outplay$time,competitor4outplay$layPrice1,
 ## Mean/Variance for each player without normalisation. 
 
 
-###Winners mean and variance 
-```{r}
+### Winners mean and variance 
+```{r echo = FALSE}
 print("Lay Price Mean")
 mean(winneroutplay$layPrice1)
 print("Lay Price Variance")
@@ -179,9 +179,9 @@ mean(winneroutplay$backPrice1)
 print("Back Price Variance")
 var(winneroutplay$backPrice1)
 ```
-###Competitor 2 mean and variance
+### Competitor 2 mean and variance
 
-```{r}
+```{r echo = FALSE}
 print("Lay Price Mean")
 mean(competitor2outplay$layPrice1)
 print("Lay Price Variance")
@@ -191,9 +191,9 @@ mean(competitor2outplay$backPrice1)
 print("Back Price Variance")
 var(competitor2outplay$backPrice1)
 ```
-###Competitor 3 mean and variance
+### Competitor 3 mean and variance
 
-```{r}
+```{r echo = FALSE}
 print("Lay Price Mean")
 mean(competitor3outplay$layPrice1)
 print("Lay Price Variance")
@@ -203,8 +203,8 @@ mean(competitor3outplay$backPrice1)
 print("Back Price Variance")
 var(competitor3outplay$backPrice1)
 ```
-###Competitor 4 mean and variance
-```{r}
+### Competitor 4 mean and variance
+```{r echo = FALSE}
 print("Lay Price Mean")
 mean(competitor4outplay$layPrice1)
 print("Lay Price Variance")
@@ -258,7 +258,8 @@ If you laid the horse at "2018-06-20 15:41:50 UTC" with a 22.45 GBP stake at 19.
 So the horse won and you got 13114.2. You have to pay 415.33 out of your winnings, which leaves you at 12,698.87. Your initial investment was 437.14+22.45 = 459.59, (or 874.92 if you include your liability), so your percentage return is 2750%. 
 
 
-#Bibliography
+## Bibliography
+
 Bernoulli Article 
 https://www.jstor.org/stable/1909829?seq=1#metadata_info_tab_contents
 
