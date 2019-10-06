@@ -2,8 +2,8 @@
 title: "EDA of Four Horses in a Race"
 author: '150000760'
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -15,7 +15,7 @@ Our report finds that the maximum amount of winnings possible only betting befor
 
 The expectation and variance shows that gamblers price things somewhat correctly, that is they give each horse an equal shot, and have tremendous anxiety. 
 
-Relevant plots are redone in SAS, to prove repeatability. 
+Relevant plots are redone in SAS, to prove repeatability, and are attached in a seperate file . 
 
 ### Introduction
 
@@ -58,7 +58,7 @@ library(naniar)
 vis_miss(HorseData, warn_large_data = FALSE)
 ```
 
-For Ease of analysis, we would like to remove NaN values, but important information - whether the Horse won or lost - is in these columns. A Column is formed of all False Booleans, then the competitor 11473056 with the winning horse is changed to true. 
+For Ease of analysis, we would like to remove NaN values, but important information - whether the Horse won or lost - is in these columns. A Column is formed of all False Booleans, then the competitor 11473056 with the winning horse is changed to true. It does not matter if you remove the final backPrice1 rows. By that point the horse would have lost anyways, so it would not be possible to lay them.
 
 ```{r}
 HorseData$Winner <- FALSE
@@ -95,7 +95,7 @@ unique(HorseData$competitor)
 sorted_data <- HorseData[order(HorseData$competitor, HorseData$time),]
 ```
 
-The following four competitors were randomly chosen. For ease of data replication, the extracted datasets were exported to CSV. 
+The following three competitors and the winner were randomly chosen (by eyeball not RNG). For ease of data replication, the extracted datasets were exported to CSV. 
 ```{r output=FALSE}
 winner<-sorted_data[which(sorted_data$competitor==11473056), ]
 write.csv(winner,"./winner.csv", row.names=FALSE)
@@ -107,105 +107,164 @@ competitor4<-sorted_data[which(sorted_data$competitor==10339376), ]
 write.csv(competitor4,"./competitor4.csv", row.names=FALSE)
 ```
 
-Back and Lay odds trace for pre-inplay data. 
+# Back and Lay odds trace for pre-inplay data. 
 
 ```{r echo = FALSE}
 
-winneroutplay<-sorted_data[which(winner$inplay==FALSE,), ]
+winneroutplay<-winner[which(winner$inplay==FALSE & winner$marketStatus=="OPEN"), ]
 write.csv(winneroutplay,"./winneroutplay.csv", row.names=FALSE)
-plot(winneroutplay$time,winneroutplay$backPrice1)
-competitor2outplay<-competitor2[which(competitor2$inplay==FALSE,), ]
+plot(winneroutplay$time,winneroutplay$backPrice1,
+     main="Winner Back Price over Time",
+     xlab = "Time",
+     ylab = "Back Price")
+
+competitor2outplay<-competitor2[which(competitor2$inplay==FALSE & competitor2$marketStatus=="OPEN"), ]
+
+
 write.csv(competitor2outplay,"./competitor2outplay.csv", row.names=FALSE)
-plot(competitor2outplay$time,competitor2outplay$backPrice1)
-competitor3outplay<-competitor3[which(competitor3$inplay==FALSE,), ]
+plot(competitor2outplay$time,competitor2outplay$backPrice1,
+     main="Competitor 2 Back Price over Time",
+     xlab = "Time",
+     ylab = "Back Price")
+competitor3outplay<-competitor3[which(competitor3$inplay==FALSE& competitor3$marketStatus=="OPEN"), ]
 
 write.csv(competitor3outplay,"./competitor3outplay.csv", row.names=FALSE)
-plot(competitor3outplay$time,competitor3outplay$backPrice1)
-competitor4outplay<-competitor4[which(competitor4$inplay==FALSE,), ]
+plot(competitor3outplay$time,competitor3outplay$backPrice1,
+     main="Competitor 3 Back Price over Time",
+     xlab = "Time",
+     ylab = "Back Price")
+competitor4outplay<-competitor4[which(competitor4$inplay==FALSE & competitor4$marketStatus=="OPEN"), ]
 
 write.csv(competitor4outplay,"./competitor4outplay.csv", row.names=FALSE)
-plot(competitor4outplay$time,competitor4outplay$backPrice1)
+plot(competitor4outplay$time,competitor4outplay$backPrice1,
+     main="Competitor 4 Back Price over Time",
+     xlab = "Time",
+     ylab = "Back Price")
+
+
 ```
 
 
 ```{r}
-plot(winneroutplay$time,winneroutplay$layPrice1)
-plot(competitor2outplay$time,competitor2outplay$layPrice1)
-plot(competitor3outplay$time,competitor3outplay$layPrice1)
-plot(competitor4outplay$time,competitor4outplay$layPrice1)
+plot(winneroutplay$time,winneroutplay$layPrice1,
+     main="Winner Lay Price over Time",
+     xlab = "Time",
+     ylab = "Lay Price")
+plot(competitor2outplay$time,competitor2outplay$layPrice1,
+     main="Competitor 2 Lay Price over Time",
+     xlab = "Time",
+     ylab = "Lay Price")
+plot(competitor3outplay$time,competitor3outplay$layPrice1,
+     main="Competitor 3 Lay Price over Time",
+     xlab = "Time",
+     ylab = "Lay Price")
+plot(competitor4outplay$time,competitor4outplay$layPrice1,
+     main="Competitor 4 Lay Price over Time",
+     xlab = "Time",
+     ylab = "Lay Price")
 ```
-### Mean/Variance for each player without normalisation. 
 
 
-Winner mean and variance 
+## Mean/Variance for each player without normalisation. 
+
+
+###Winners mean and variance 
 ```{r}
+print("Lay Price Mean")
 mean(winneroutplay$layPrice1)
+print("Lay Price Variance")
 var(winneroutplay$layPrice1)
+print("Back Price Mean")
 mean(winneroutplay$backPrice1)
+print("Back Price Variance")
 var(winneroutplay$backPrice1)
 ```
-Competitor 2 mean and variance
+###Competitor 2 mean and variance
 
 ```{r}
+print("Lay Price Mean")
 mean(competitor2outplay$layPrice1)
+print("Lay Price Variance")
 var(competitor2outplay$layPrice1)
+print("Back Price Mean")
 mean(competitor2outplay$backPrice1)
+print("Back Price Variance")
 var(competitor2outplay$backPrice1)
 ```
-Competitor 3 mean and variance
+###Competitor 3 mean and variance
 
 ```{r}
+print("Lay Price Mean")
 mean(competitor3outplay$layPrice1)
+print("Lay Price Variance")
 var(competitor3outplay$layPrice1)
+print("Back Price Mean")
 mean(competitor3outplay$backPrice1)
+print("Back Price Variance")
 var(competitor3outplay$backPrice1)
 ```
-Competitor 4 mean and variance
+###Competitor 4 mean and variance
 ```{r}
+print("Lay Price Mean")
 mean(competitor4outplay$layPrice1)
+print("Lay Price Variance")
 var(competitor4outplay$layPrice1)
+print("Back Price Mean")
 mean(competitor4outplay$backPrice1)
+print("Back Price Variance")
 var(competitor4outplay$backPrice1)
 ```
 
 
-Mean and variance do not tell you much. However competitor 3 and 4 appear to be more volatile, and reflects uncertainity in the markets. 
+Mean and variance without standardization do not tell you much. To an extent, it reflects uncertainty and how the markets guage certain horses. By this metric, it seems competitor 3 and 4 were favorites, though with large uncertainty, wheras the winner was not a favorite, though the markets did not rule him out. Visually, there is increased movement right before the race starts. Without using statistical tests, one sees that it is more "jagged" and "movey" then. 
 
 
 ## How much money could you have made on the winner?
+
+Here is a plot of volume*price. The maxima reflects the amount of money you could have made if you bought a 
 
 ```{r echo = FALSE}
 plot(winneroutplay$time,winneroutplay$backVP)
 ```
 
+Lets find the maximum vp, the time at which it occured, and the maximum stake size. 
 
 ```{r echo = FALSE}
 
 max(winneroutplay$backVP)
 winneroutplay$time[which.max(winneroutplay$backVP)]
 winneroutplay$backVolume1[which.max(winneroutplay$backVP)]
+winneroutplay$backPrice1[which.max(winneroutplay$backVP)]
 ```
-So the most money you could have made is by backing the winner at 15:56:50.
+So the most money you could have made is by backing the winner at 15:56:50 for 437.14 stake at 30/1 odds.
 
-What was the stake you needed?
-
-```{r echo = FALSE}
-winneroutplay$backVolume1[which.max(winneroutplay$backVP)]
-```
 
 So could you have found a lay, so that the 437.14 stake would have been recovered if you lost?
 
 ```{r echo = FALSE}
-winneroutplay$time[which.min(winneroutplay$layVP>1303.47)]
-winneroutplay$layVolume1[which.min(winneroutplay$layVP>1303.47)]
-winneroutplay$layPrice1[which.min(winneroutplay$layVP>1303.47)]
+# find min value
+n = min(winneroutplay$layVP[which(winneroutplay$layVP>437.14)])
+n
+# find index of min value
+
+m = which(winneroutplay$layVP==n)[1]
+
+winneroutplay$time[m]
+winneroutplay$layVolume1[m]
+winneroutplay$layPrice1[m]
 ```
-So your overall earnings if you backed and laid at the time indicated above would be 11976.2 
+If you laid the horse at "2018-06-20 15:41:50 UTC" with a 22.45 GBP stake at 19.5 odds, you would make 437.78 GBP and cover your loss. You are however liable for the remaining 437.78-22.45 = 415.33 GBP if the horse wins. 
 
-```{r echo = FALSE}
-max(winner$backVP)-winner$layVP[which.min(winner$layVP>1303.47)]
-```
-Your overall return would be 11976.2 on your initial investment. Not so bad!
+So the horse won and you got 13114.2. You have to pay 415.33 out of your winnings, which leaves you at 12,698.87. Your initial investment was 437.14+22.45 = 459.59, (or 874.92 if you include your liability), so your percentage return is 2750%. 
 
 
+#Bibliography
+Bernoulli Article 
+https://www.jstor.org/stable/1909829?seq=1#metadata_info_tab_contents
+
+Explained Betting Exchange
+https://betting.betfair.com/what-is-a-betting-exchange.html
+
+Explains how laying work
+https://betting.betfair.com/how-to-use-betfair-exchange/beginner-guides/placing-a-lay-bet-010819-51.html
 
