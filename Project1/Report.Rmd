@@ -1,7 +1,9 @@
 ---
 title: "EDA of Four Horses in a Race"
-output: html_document
-author: "150000760"
+author: '150000760'
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -110,12 +112,18 @@ Back and Lay odds trace for pre-inplay data.
 ```{r echo = FALSE}
 
 winneroutplay<-sorted_data[which(winner$inplay==FALSE,), ]
+write.csv(winneroutplay,"./winneroutplay.csv", row.names=FALSE)
 plot(winneroutplay$time,winneroutplay$backPrice1)
 competitor2outplay<-competitor2[which(competitor2$inplay==FALSE,), ]
+write.csv(competitor2outplay,"./competitor2outplay.csv", row.names=FALSE)
 plot(competitor2outplay$time,competitor2outplay$backPrice1)
 competitor3outplay<-competitor3[which(competitor3$inplay==FALSE,), ]
+
+write.csv(competitor3outplay,"./competitor3outplay.csv", row.names=FALSE)
 plot(competitor3outplay$time,competitor3outplay$backPrice1)
 competitor4outplay<-competitor4[which(competitor4$inplay==FALSE,), ]
+
+write.csv(competitor4outplay,"./competitor4outplay.csv", row.names=FALSE)
 plot(competitor4outplay$time,competitor4outplay$backPrice1)
 ```
 
