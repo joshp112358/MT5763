@@ -1,53 +1,88 @@
 ---
-title: "Analysis of Two Horse Races"
+title: "EDA of Four Horses in a Race"
 output: html_document
+author: "150000760"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+### Executive Summary
 
-## Introduction
+Our report finds that the maximum amount of winnings possible only betting before the race on the winning horse is 11976.60 GBP, taking a lay position that would cover the back stake, if the winning horse had actually lost. The total lay and back stakes were 70.28 + 1303.47 = 1373.75, so a total percentage profit of 770%. 
 
-### Odds
+The expectation and variance shows that gamblers price things somewhat correctly, that is they give each horse an equal shot, and have tremendous anxiety. 
 
-Let’s say you and a friend are gambling with a fair 6-sided dice. If it lands on an even number, your friend has to give you 10 dollars, and if it lands on an odd number, you give your friend 10 dollars. On any given dice roll, the probability you win or lose is 50%, so the expected value of the amount of money you would make is 0.5($10)-0.5($10) = $0. So the game is fair, as both players can expect to make no money, even though if one stops at any given time, one player will have more money than the other. 
+Relevant plots are redone in SAS, to prove repeatability. 
 
-Now let’s revise that game slightly. If the dice lands on a 1 or 2, your friend has to give you 10 dollars, but if it lands on a 3,4,5, or 6, you have to give your friend 10 dollars. Would you take that bet? The expected value on any given turn would be ⅓($10) - ⅔(10) = $-3.33, so you would be irrational to take it on, and it would not be fair. 
+### Introduction
 
-How would one revise this game to make it fair? If the dice lands on a 1 or 2, your friend gave you 20 dollars, but if it lands on a 3,4,5, or 6, you still gave your friend 10 dollars. Then the expected value  ⅓($20) - ⅔(10) = $0 and the game is fair again. 
+This report analyzes betting exchange data for three randomly chosen horses and the winner. After data cleaning and Exploratory Data Analysis we determine the maximum amount of profit that could be made using an arbitrage position for the winner and the losers. 
 
-So if you are a bookmaker, and you give out odds (the payout multiple of a bet), your job would be to calculate the probability of the bet occuring, and offer a multiple on that bet so that any average Joe would think it was fair, but your expected value is slightly positive, and theirs is slightly negative. If you get too greedy, no one will want to play with you. If we played the game of the previous paragraph, I could offer my friend gets 19 and I get 11. If they cannot do arithmetic they may think I was awfully generous, even though I know over the long term I will run them broke. 
+Backing a horse is betting that that horse will win. Laying a horse is betting that that horse will lose. Given n horses in a race, n-1 of them will lose, so the probability that a horse loses is higher than the probability that a given horse wins. A stake is the amount of money you will place on a bet, which is capped by the total volume in the market. 
 
-For further reference, I would read about Gambler’s ruin and fallacy. 
-http://mathworld.wolfram.com/GamblersRuin.html 
-https://en.wikipedia.org/wiki/Gambler%27s_fallacy 
+Odds are the multiple offered on a stake for a given bet, laying or backing. Odds given are intrinsically related to the probability that a certain event will occur. This is because the goal of a fair bet is to make the expected value zero. 
 
-### Backing and Laying 
+A beautiful analysis on whether such gambling is worth doing is Daniel Bernoulli's "Exposition of a New Theory on the Measurement of Risk" from 1738. It is available on JSTOR. 
 
-https://www.gamblingsites.com/sports-betting/types/exchange/
+## Exploratory Data Analysis
 
-To quote from gamblingsites.com, “backing a selection is betting that it will happen” and “laying a selection is betting that it will not happen”. It is clear that there are more things that cannot happen than that can happen, and so their respective odds reflect this. When considering horse racing, to count the size of an events that could occur, note you can either place a bet or not and you can bet whether the event will occur or not. So there is at least $4^n$ events that could occur, which is large, but certainly not infinite. To visualize this space, recall Kolmogrov’s observation that the space of events is a -algebra and that probability is a measure, so the number of events that could occur is the same as the vertices of a generalized hypercube. More sophisticated and accurate counting of events would require Polya-Redfield Enumeration. 
-
-https://en.wikipedia.org/wiki/Hypercube 
-https://en.wikipedia.org/wiki/Antichain 
-https://en.wikipedia.org/wiki/Pólya_enumeration_theorem
-
-### Example
-
-
-![Hasse Diagram](./Hasse.png)
-
-Let’s say you are betting on events A, B, and C, and you want to look at the space of events that could occur. Then you could take as vertices the Power Set of A,B, and C, adjoining vertices X and Y if X is a subset of Y.
-
-Then the probability that the event B will not occur, would be the set of vertices that do not contain B, or 3/7, (not including the empty event). 
-
-## Data Cleaning
-```{r Data Load}
+```{r echo = FALSE}
 library(readxl)
 HorseData <- read_excel("~/Desktop/MT5763/Project1/HorseData.xlsx")
 ```
-Number of competitors - 33
+
+
+With any dataset, it is good to see summary stats. 
+
+```{r echo = FALSE}
+summary(HorseData)
+```
+
+The data is not nice! We would like Price and Volume columns to be numeric so that we may manipulate such calculations. 
+
+```{r echo = FALSE}
+HorseData$backPrice1 <- as.numeric(HorseData$backPrice1)
+HorseData$backVolume1 <- as.numeric(HorseData$backVolume1)
+HorseData$layPrice1 <- as.numeric(HorseData$layPrice1)
+HorseData$layVolume1 <- as.numeric(HorseData$layVolume1)
+```
+
+
+There is quite a number of NaNs! Can we visualize them? 
+
+```{r}
+library(naniar)
+vis_miss(HorseData, warn_large_data = FALSE)
+```
+
+For Ease of analysis, we would like to remove NaN values, but important information - whether the Horse won or lost - is in these columns. A Column is formed of all False Booleans, then the competitor 11473056 with the winning horse is changed to true. 
+
+```{r}
+HorseData$Winner <- FALSE
+HorseData$Winner[HorseData$competitor == 11473056] <- TRUE
+
+```
+Now the NaNs are removed. 
+
+```{r}
+HorseData <- na.omit(HorseData)
+```
+
+And finally, two new columns are added for ease of analysis
+```{r}
+HorseData$backVP <- HorseData$backPrice1 * HorseData$backVolume1
+HorseData$layVP <- HorseData$layPrice1 * HorseData$layVolume1
+```
+
+```{r}
+summary(HorseData)
+```
+
+
+## Variance and Expectation analysis
+
+There are in total, 33 unique competitors in the two races. 
 
 ```{r}
 unique(HorseData$competitor)
@@ -60,44 +95,109 @@ sorted_data <- HorseData[order(HorseData$competitor, HorseData$time),]
 
 The following four competitors were randomly chosen. For ease of data replication, the extracted datasets were exported to CSV. 
 ```{r output=FALSE}
-competitor1<-sorted_data[which(sorted_data$competitor==8692300), ]
-write.csv(competitor1,"./competitor1.csv", row.names=FALSE)
+winner<-sorted_data[which(sorted_data$competitor==11473056), ]
+write.csv(winner,"./winner.csv", row.names=FALSE)
 competitor2<-sorted_data[which(sorted_data$competitor==11538828), ]
 write.csv(competitor2,"./competitor2.csv", row.names=FALSE)
 competitor3<-sorted_data[which(sorted_data$competitor==9977366), ]
 write.csv(competitor3,"./competitor3.csv", row.names=FALSE)
 competitor4<-sorted_data[which(sorted_data$competitor==10339376), ]
 write.csv(competitor4,"./competitor4.csv", row.names=FALSE)
-plot(competitor1$time,competitor1$backPrice1)
-plot(competitor1$time,competitor1$backVolume1)
-plot(competitor2$time,competitor2$backPrice1)
-plot(competitor2$time,competitor2$backVolume1)
-plot(competitor3$time,competitor3$backPrice1)
-plot(competitor3$time,competitor3$backVolume1)
-plot(competitor4$time,competitor4$backPrice1)
-plot(competitor4$time,competitor4$backVolume1)
 ```
+
+Back and Lay odds trace for pre-inplay data. 
+
+```{r echo = FALSE}
+
+winneroutplay<-sorted_data[which(winner$inplay==FALSE,), ]
+plot(winneroutplay$time,winneroutplay$backPrice1)
+competitor2outplay<-competitor2[which(competitor2$inplay==FALSE,), ]
+plot(competitor2outplay$time,competitor2outplay$backPrice1)
+competitor3outplay<-competitor3[which(competitor3$inplay==FALSE,), ]
+plot(competitor3outplay$time,competitor3outplay$backPrice1)
+competitor4outplay<-competitor4[which(competitor4$inplay==FALSE,), ]
+plot(competitor4outplay$time,competitor4outplay$backPrice1)
+```
+
 
 ```{r}
-plot(competitor1$time,competitor1$layPrice1)
-plot(competitor1$time,competitor1$layVolume1)
-plot(competitor2$time,competitor2$layPrice1)
-plot(competitor2$time,competitor2$layVolume1)
-plot(competitor3$time,competitor3$layPrice1)
-plot(competitor3$time,competitor3$layVolume1)
-plot(competitor4$time,competitor4$layPrice1)
-plot(competitor4$time,competitor4$layVolume1)
+plot(winneroutplay$time,winneroutplay$layPrice1)
+plot(competitor2outplay$time,competitor2outplay$layPrice1)
+plot(competitor3outplay$time,competitor3outplay$layPrice1)
+plot(competitor4outplay$time,competitor4outplay$layPrice1)
+```
+### Mean/Variance for each player without normalisation. 
+
+
+Winner mean and variance 
+```{r}
+mean(winneroutplay$layPrice1)
+var(winneroutplay$layPrice1)
+mean(winneroutplay$backPrice1)
+var(winneroutplay$backPrice1)
+```
+Competitor 2 mean and variance
+
+```{r}
+mean(competitor2outplay$layPrice1)
+var(competitor2outplay$layPrice1)
+mean(competitor2outplay$backPrice1)
+var(competitor2outplay$backPrice1)
+```
+Competitor 3 mean and variance
+
+```{r}
+mean(competitor3outplay$layPrice1)
+var(competitor3outplay$layPrice1)
+mean(competitor3outplay$backPrice1)
+var(competitor3outplay$backPrice1)
+```
+Competitor 4 mean and variance
+```{r}
+mean(competitor4outplay$layPrice1)
+var(competitor4outplay$layPrice1)
+mean(competitor4outplay$backPrice1)
+var(competitor4outplay$backPrice1)
 ```
 
 
-## How much money could you have made?
+Mean and variance do not tell you much. However competitor 3 and 4 appear to be more volatile, and reflects uncertainity in the markets. 
 
-You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+## How much money could you have made on the winner?
+
+```{r echo = FALSE}
+plot(winneroutplay$time,winneroutplay$backVP)
 ```
 
-## Variance and Expectation Analysis 
 
-## Conclusions
+```{r echo = FALSE}
+
+max(winneroutplay$backVP)
+winneroutplay$time[which.max(winneroutplay$backVP)]
+winneroutplay$backVolume1[which.max(winneroutplay$backVP)]
+```
+So the most money you could have made is by backing the winner at 15:56:50.
+
+What was the stake you needed?
+
+```{r echo = FALSE}
+winneroutplay$backVolume1[which.max(winneroutplay$backVP)]
+```
+
+So could you have found a lay, so that the 437.14 stake would have been recovered if you lost?
+
+```{r echo = FALSE}
+winneroutplay$time[which.min(winneroutplay$layVP>1303.47)]
+winneroutplay$layVolume1[which.min(winneroutplay$layVP>1303.47)]
+winneroutplay$layPrice1[which.min(winneroutplay$layVP>1303.47)]
+```
+So your overall earnings if you backed and laid at the time indicated above would be 11976.2 
+
+```{r echo = FALSE}
+max(winner$backVP)-winner$layVP[which.min(winner$layVP>1303.47)]
+```
+Your overall return would be 11976.2 on your initial investment. Not so bad!
+
+
+
