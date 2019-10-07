@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 ### Executive Summary
 
-Our report finds that the maximum amount of winnings possible only betting before the race on the winning horse is 12,698.87. Your initial investment was 437.14+22.45 = 459.59, (or 874.92 if you include your liability), so your percentage return is 2750%.
+Our report finds that the maximum amount of winnings possible only betting before the race on the winning horse is 12,698.87. Your initial investment was 437.14+22.45 = 459.59, so your percentage return is 2750%.
 
 The expectation and variance reflects uncertainty to predictions, which is right as gamblers should be uncertain. 
 
@@ -25,7 +25,6 @@ Backing a horse is betting that that horse will win. Laying a horse is betting t
 
 Odds are the multiple offered on a stake for a given bet, laying or backing. Odds given are intrinsically related to the probability that a certain event will occur. This is because the goal of a fair bet is to make the expected value zero. 
 
-A beautiful analysis on whether such gambling is worth doing is Daniel Bernoulli's "Exposition of a New Theory on the Measurement of Risk" from 1738. A link is attached below. 
 
 ## Exploratory Data Analysis
 
@@ -221,7 +220,7 @@ Mean and variance without standardization do not tell you much. To an extent, it
 
 ## How much money could you have made on the winner?
 
-Here is a plot of volume*price. The maxima reflects the amount of money you could have made if you bought a 
+Here is a plot of volume*price. The maxima reflects the amount of money you could have made if you bought at that specific time, the entire volume.
 
 ```{r echo = FALSE}
 plot(winneroutplay$time,winneroutplay$backVP)
@@ -236,7 +235,7 @@ winneroutplay$time[which.max(winneroutplay$backVP)]
 winneroutplay$backVolume1[which.max(winneroutplay$backVP)]
 winneroutplay$backPrice1[which.max(winneroutplay$backVP)]
 ```
-So the most money you could have made is by backing the winner at 15:56:50 for 437.14 stake at 30/1 odds.
+So 13,114.20 GBP was the maximum you could have made if you backed the winner at 15:56:50 with a 437.14 stake at 30/1 odds.
 
 
 So could you have found a lay, so that the 437.14 stake would have been recovered if you lost?
@@ -253,14 +252,14 @@ winneroutplay$time[m]
 winneroutplay$layVolume1[m]
 winneroutplay$layPrice1[m]
 ```
-If you laid the horse at "2018-06-20 15:41:50 UTC" with a 22.45 GBP stake at 19.5 odds, you would make 437.78 GBP and cover your loss. You are however liable for the remaining 437.78-22.45 = 415.33 GBP if the horse wins. 
+If you laid the horse at "2018-06-20 15:41:50 UTC" with a 22.45 GBP stake at 19.5 odds, you would make 437.78 GBP and covered your loss. You are however liable for the remaining 437.78-22.45 = 415.33 GBP if the horse wins. 
 
-So the horse won and you got 13114.2. You have to pay 415.33 out of your winnings, which leaves you at 12,698.87. Your initial investment was 437.14+22.45 = 459.59, (or 874.92 if you include your liability), so your percentage return is 2750%. 
+So the horse won and you got 13114.20. You have to pay 415.33 out of your winnings, which leaves you at 12,698.87. Your initial investment was 437.14+22.45 = 459.59, (or 874.92 if you include your liability), so your percentage return is 2750%. 
 
 
 ## Bibliography
 
-Bernoulli Article 
+Bernoulli Article on Risk 
 https://www.jstor.org/stable/1909829?seq=1#metadata_info_tab_contents
 
 Explained Betting Exchange
